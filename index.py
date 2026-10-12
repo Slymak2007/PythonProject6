@@ -65,8 +65,9 @@ class Order:
     def to_dict(self):
         return {
             "order_id": self.order_id,
-            "customer": self.customer,
+            "customer": self.customer.name,
             "email": self.email
+
         }
 
     @classmethod
@@ -95,8 +96,8 @@ class Order:
 def placing():
     order_ids = 1
     customer_ids = 1
-    name = "dima"
-    email = "kra"
+    name = input("Name: ")
+    email = input("Email: ")
 
     customer = Customer(customer_ids, name, email)
 
@@ -111,11 +112,20 @@ def placing():
 
     return order, customer
 
-if __name__ == "__main__":
+def saving_order():
     order, customer = placing()
     print(repr(order))
 
     order_dict = order.to_dict()
-    print(order_dict)
-    print(order)
-    print(customer)
+    json_order = json.dumps(order_dict)
+    loaded_order = json.loads(json_order)
+    restored = Order.from_order(loaded_order)
+    print(loaded_order)
+    order_name = "saved_orders/order" + str(restored.order_id)
+    print(order_name)
+    with open(order_name, "w") as f:
+        json.dump(loaded_order, f, indent=2)
+
+if __name__ == "__main__":
+    saving_order()
+    print("/")
