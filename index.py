@@ -84,12 +84,6 @@ class Order:
         return (f"Замовлення #{self.order_id} | Клієнт: {self.customer.name} | "
                 f"Товарів: {len(self.products_order)} | Сума: {self.calculate_order_total()} грн")
 
-'''class JsonStorage:
-    def __init__(self, path):
-        self.path = pathlib.Path(path)
-
-    def save_json(self, data):
-        self.path'''
 
 #ДЕМОНСТРАЦІЯ РОБОТИ
 
