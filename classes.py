@@ -1,3 +1,5 @@
+from itertools import product
+
 
 class Product:
     def __init__(self, product_id, name, base_price, pType):
@@ -66,19 +68,22 @@ class Order:
 
     def add_product(self, product):
         self.products_order.append(product)
-        self.product_names.append(product.name)
+        self.product_names.append(product["name"])
 
-    def calculate_order_total(self):
-        #кожен товар сам знає, як рахувати свою ціну
-        return sum(product.calculate_total_price() for product in self.products_order)
+
+    def calculate_order_total(self, products_order):
+        total_price = 0
+        for i in products_order:
+            total_price += i['base_price']
+        return total_price
 
     def to_dict(self):
         return {
             "order_id": self.order_id,
             "customer": self.customer.name,
             "email": self.email,
-            "products_names": self.product_names,
-
+            "product_names": self.product_names,
+            "price": self.calculate_order_total(self.products_order),
         }
 
     @classmethod
@@ -93,5 +98,5 @@ class Order:
 
     def __str__(self):
         return (f"Замовлення #{self.order_id} | Клієнт: {self.customer.name} | "
-                f"Товарів: {len(self.products_order)} | Сума: {self.calculate_order_total()} грн")
+                f"Товарів: {len(self.products_order)} | Сума: {self.calculate_order_total(self.products_order)} грн")
 
