@@ -1,7 +1,7 @@
 from classes import *
 import pathlib
 import json
-import datetime
+import time
 
 def placing():
     order_ids = 1
@@ -17,7 +17,6 @@ def placing():
 
     with open("catalog/catalog.json", "r+") as f:
         data = json.load(f)
-        cor = []
         while True:
             print("Оберіть товари")
             for i in data:
@@ -26,11 +25,11 @@ def placing():
             if selc == 0:
                 break
             order.add_product(data[selc - 1])
-    '''order.add_product(laptop)
-    order.add_product(ebook)
-
-    order_ids += 1
-    '''
+            data[selc - 1]['stock'] -= 1
+            data[selc - 1]['popularity'] -= 1
+        f.seek(0)
+        json.dump(data, f, ensure_ascii=False, indent=4)
+        f.truncate()
     return order, customer
 
 def saving_order():
@@ -41,6 +40,6 @@ def saving_order():
     loaded_order = json.loads(json_order)
     restored = Order.from_order(loaded_order)
     print(loaded_order)
-    order_name = "saved_orders/order" + str(datetime.date.today()) + (".json")
-    with open(order_name, "w") as f:
+    order_name = "saved_orders/order" +"_"+ str(customer.name) + "_" +str(time.time())+ (".json")
+    with open(order_name, "x") as f:
         json.dump(loaded_order, f, indent=2)

@@ -1,9 +1,9 @@
 {
   "order_id": 1,
-  "customer": "d",
-  "email": "k",
-  "products_names": [
-    "Laptop",
-    "Ebook"
-  ]
+  "customer": "dima",
+  "email": "@",
+  "product_names": [
+    "Laptop"
+  ],
+  "price": 25000.0
 }
