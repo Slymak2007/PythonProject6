@@ -1,8 +1,8 @@
+import os
 from classes import *
 import pathlib
 import json
 import time
-
 
 class InsufficientStockError(Exception):
     pass
@@ -12,24 +12,23 @@ class InvalidOrderStatusError(Exception):
     pass
 
 
+
 def placing():
-    order_ids = 1
+    clear = lambda: os.system('cls')
+    order_ids = time.time()
     customer_ids = 1
     name = input("Enter your name: ")
     email = input("Enter your email: ")
     customer = Customer(customer_ids, name, email)
     order = Order(order_ids, customer, email)
-    laptop = PhysicalProduct(1, "Laptop", 25000.0, "physical", 2, )
-    smartphone = PhysicalProduct(2, "Smasung A52", 20000, "physical",1)
-    ebook = DigitalProduct(3, "Ebook", 300.0, "physical", "http://link.com/book")
     with open("catalog/catalog.json", "r+") as f:
         data = json.load(f)
         while True:
-            print("Оберіть товари")
+            print("Список товарів:")
             for i in data:
                 print("Назва:", i['name'] + " Price:", i['base_price'], " Id:", i['product_id'])
             try:
-                selc = int(input())
+                selc = int(input("Напишіть id товару який хочете обрати:"))
                 if selc == 0:
                     break
                 if selc < 1:
@@ -53,6 +52,8 @@ def placing():
             except InvalidOrderStatusError as e:
                 print(e)
                 break
+            clear()
+            print("Товар додано до корзини!")
     return order, customer
 
 def saving_order():
@@ -61,7 +62,6 @@ def saving_order():
     json_order = json.dumps(order_dict)
     loaded_order = json.loads(json_order)
     restored = Order.from_order(loaded_order)
-    print(loaded_order)
     order_name = "saved_orders/order" +"_"+ str(customer.name) + "_" +str(time.time())+ (".json")
     with open(order_name, "x") as f:
         json.dump(loaded_order, f, indent=2)
