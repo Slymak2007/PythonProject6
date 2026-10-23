@@ -4,23 +4,23 @@
         "name": "Laptop",
         "base_price": 25000.0,
         "type": "physical",
-        "stock": 9,
-        "popularity": -1
+        "stock": 7,
+        "popularity": 1
     },
     {
         "product_id": 2,
         "name": "Smasung A52",
         "base_price": 20000,
         "type": "physical",
-        "stock": 9,
-        "popularity": -1
+        "stock": 6,
+        "popularity": 1
     },
     {
         "product_id": 3,
         "name": "Ebook",
         "base_price": 300.0,
         "type": "physical",
-        "stock": 9,
-        "popularity": -1
+        "stock": 8,
+        "popularity": 0
     }
 ]
