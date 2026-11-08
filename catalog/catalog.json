@@ -4,8 +4,8 @@
         "name": "Laptop",
         "base_price": 25000.0,
         "type": "physical",
-        "stock": 6,
-        "popularity": 2
+        "stock": 0,
+        "popularity": 0
     },
     {
         "product_id": 2,
@@ -13,7 +13,7 @@
         "base_price": 20000,
         "type": "physical",
         "stock": 5,
-        "popularity": 2
+        "popularity": 5
     },
     {
         "product_id": 3,
@@ -21,6 +21,6 @@
         "base_price": 300.0,
         "type": "physical",
         "stock": 8,
-        "popularity": 0
+        "popularity": 2
     }
 ]
