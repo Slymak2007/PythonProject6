@@ -5,22 +5,27 @@
         "base_price": 25000.0,
         "type": "physical",
         "stock": 0,
-        "popularity": 0
+        "popularity": 0,
+        "weight_kg": 2.0,
+        "shipping_rate": 50.0
     },
     {
         "product_id": 2,
-        "name": "Smasung A52",
-        "base_price": 20000,
+        "name": "Samsung A52",
+        "base_price": 20000.0,
         "type": "physical",
-        "stock": 5,
-        "popularity": 5
+        "stock": 4,
+        "popularity": 6,
+        "weight_kg": 0.2,
+        "shipping_rate": 50.0
     },
     {
         "product_id": 3,
         "name": "Ebook",
         "base_price": 300.0,
-        "type": "physical",
-        "stock": 8,
-        "popularity": 2
+        "type": "digital",
+        "stock": 6,
+        "popularity": 4,
+        "download_link": "https://example.com/downloads/ebook.pdf"
     }
 ]
