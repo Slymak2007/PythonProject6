@@ -4,7 +4,7 @@
 """
 import logging
 
-from group_project.analytics import SalesAnalytics
+from analytics import SalesAnalytics
 from classes import (Customer, Order, OrderItem, OrderStatus, OutOfStockError,
                      ValidationError)
 from storage import OrderExistsError, StorageError

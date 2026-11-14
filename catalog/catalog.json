@@ -4,8 +4,8 @@
         "name": "Laptop",
         "base_price": 25000.0,
         "type": "physical",
-        "stock": 0,
-        "popularity": 0,
+        "stock": 9,
+        "popularity": 1,
         "weight_kg": 2.0,
         "shipping_rate": 50.0
     },
@@ -14,8 +14,8 @@
         "name": "Samsung A52",
         "base_price": 20000.0,
         "type": "physical",
-        "stock": 4,
-        "popularity": 6,
+        "stock": 9,
+        "popularity": 9,
         "weight_kg": 0.2,
         "shipping_rate": 50.0
     },
@@ -24,8 +24,8 @@
         "name": "Ebook",
         "base_price": 300.0,
         "type": "digital",
-        "stock": 6,
-        "popularity": 4,
+        "stock": 9,
+        "popularity": 5,
         "download_link": "https://example.com/downloads/ebook.pdf"
     }
 ]
