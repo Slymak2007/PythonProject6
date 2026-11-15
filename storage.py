@@ -1,4 +1,3 @@
-"""Збереження даних: каталог (catalog.json) і замовлення (saved_orders/orderN.json)."""
 import functools
 import json
 import logging
@@ -29,12 +28,6 @@ class OrderExistsError(StorageError):
 
 
 def safe_io(operation):
-    """Декоратор для операцій з файлами.
-
-    Перетворює «сирі» OSError / помилки JSON на зрозумілу StorageError (з описом операції),
-    записує причину в лог і зберігає оригінальний виняток як __cause__.
-    Помилки магазину (ShopError) пропускає без змін.
-    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
