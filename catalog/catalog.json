@@ -14,8 +14,8 @@
         "name": "Samsung A52",
         "base_price": 20000.0,
         "type": "physical",
-        "stock": 9,
-        "popularity": 9,
+        "stock": 8,
+        "popularity": 10,
         "weight_kg": 0.2,
         "shipping_rate": 50.0
     },
@@ -24,8 +24,8 @@
         "name": "Ebook",
         "base_price": 300.0,
         "type": "digital",
-        "stock": 9,
-        "popularity": 5,
+        "stock": 8,
+        "popularity": 6,
         "download_link": "https://example.com/downloads/ebook.pdf"
     }
 ]

@@ -1,7 +1,3 @@
-"""Тести оформлення замовлення: Cart, Customer, place_order та поведінка при збоях.
-
-Запуск із кореня проєкту:   python -m unittest -v
-"""
 import os
 from datetime import date
 from unittest import mock
@@ -12,10 +8,6 @@ from shop_service import MAX_ID_RETRIES, active_order_records, change_order_stat
 from storage import OrderExistsError, StorageError
 from tests.base import EBOOK, EMAIL, LAPTOP, NAME, PHONE, ShopTestCase
 
-
-# =====================================================================
-#  Кошик
-# =====================================================================
 class CartTests(ShopTestCase):
     def test_add_accumulates_quantity(self):
         cart, phone = Cart(), self.product(PHONE)
@@ -87,7 +79,6 @@ class CartTests(ShopTestCase):
 
     def test_total_includes_shipping_of_physical_products_only(self):
         cart = self.make_cart({PHONE: 2, EBOOK: 1})
-        # 2 × (20000 + 25 доставка) + 300 (цифровий товар без доставки)
         self.assertAlmostEqual(cart.total, 40350.0)
 
     def test_quantities_mapping(self):
@@ -97,7 +88,7 @@ class CartTests(ShopTestCase):
     def test_remove_and_clear(self):
         cart = self.make_cart({PHONE: 2, EBOOK: 1})
         cart.remove(PHONE)
-        cart.remove(999)  # неіснуючий товар — не помилка
+        cart.remove(999)
         self.assertEqual(cart.quantities, {EBOOK: 1})
         cart.clear()
         self.assertTrue(cart.is_empty)
@@ -109,9 +100,6 @@ class CartTests(ShopTestCase):
         self.assertEqual(self.stock(PHONE), 5)
 
 
-# =====================================================================
-#  Дані клієнта
-# =====================================================================
 class CustomerTests(ShopTestCase):
     def test_valid_customer_is_trimmed(self):
         customer = Customer("  Іван Петренко  ", " ivan@example.com ")
@@ -131,9 +119,6 @@ class CustomerTests(ShopTestCase):
                     Customer(NAME, bad)
 
 
-# =====================================================================
-#  Успішне оформлення
-# =====================================================================
 class PlaceOrderSuccessTests(ShopTestCase):
     def test_returns_new_order_with_expected_data(self):
         cart = self.make_cart({PHONE: 2, EBOOK: 1})
@@ -231,10 +216,6 @@ class PlaceOrderSuccessTests(ShopTestCase):
         self.assertEqual(os.listdir(os.path.dirname(self.catalog_path)), ["catalog.json"])
         self.assertEqual(self.order_files(), ["order1.json"])
 
-
-# =====================================================================
-#  Помилки валідації: нічого не записується, кошик зберігається
-# =====================================================================
 class PlaceOrderValidationTests(ShopTestCase):
     def assert_nothing_changed(self, before_catalog, cart, expected_quantities):
         self.assertEqual(self.order_files(), [])
@@ -272,9 +253,6 @@ class PlaceOrderValidationTests(ShopTestCase):
         self.assertEqual(order.order_id, 1)
 
 
-# =====================================================================
-#  Нестача товару: перевірка залишків під час оформлення
-# =====================================================================
 class PlaceOrderStockTests(ShopTestCase):
     def test_stock_taken_by_another_order_is_detected(self):
         cart = self.make_cart({PHONE: 3})                      # на момент додавання було 5
@@ -326,9 +304,6 @@ class PlaceOrderStockTests(ShopTestCase):
         self.assertEqual(self.catalog_bytes(), before)
 
 
-# =====================================================================
-#  Збої сховища: відкат і узгодженість
-# =====================================================================
 class PlaceOrderStorageFailureTests(ShopTestCase):
     def test_missing_catalog_file(self):
         cart = self.make_cart({PHONE: 1})
@@ -355,10 +330,9 @@ class PlaceOrderStorageFailureTests(ShopTestCase):
             with self.assertRaises(StorageError):
                 place_order(self.storage, cart, NAME, EMAIL)
 
-        self.assertEqual(self.order_files(), [])               # файл замовлення видалено
-        self.assertEqual(self.catalog_bytes(), before)         # склад не змінено
-        self.assertEqual(cart.quantities, {PHONE: 2})          # кошик не очищено
-        # після відкату сховище працездатне, і номер 1 знову вільний
+        self.assertEqual(self.order_files(), [])
+        self.assertEqual(self.catalog_bytes(), before)
+        self.assertEqual(cart.quantities, {PHONE: 2})
         self.assertEqual(place_order(self.storage, cart, NAME, EMAIL).order_id, 1)
 
     def test_order_file_creation_failure_leaves_stock_untouched(self):
@@ -377,19 +351,18 @@ class PlaceOrderStorageFailureTests(ShopTestCase):
         with mock.patch("storage.json.dump", side_effect=OSError("збій диска")):
             with self.assertRaises(StorageError):
                 place_order(self.storage, cart, NAME, EMAIL)
-        self.assertEqual(self.order_files(), [])               # напівзаписаного файлу немає
+        self.assertEqual(self.order_files(), [])
         self.assertEqual(self.catalog_bytes(), before)
 
     def test_id_collision_is_retried_with_next_number(self):
         place_order(self.storage, self.make_cart({PHONE: 1}), NAME, EMAIL)  # order1.json
         order1_before = self.order_bytes(1)
 
-        # «хтось інший» встиг зайняти номер 1: перша спроба дає колізію, друга — вільний №2
         with mock.patch.object(self.storage, "next_order_id", side_effect=[1, 2]):
             order = place_order(self.storage, self.make_cart({PHONE: 1}), "Оля", EMAIL)
 
         self.assertEqual(order.order_id, 2)
-        self.assertEqual(self.order_bytes(1), order1_before)   # чуже замовлення не перезаписано
+        self.assertEqual(self.order_bytes(1), order1_before)   #
         self.assertEqual(self.order_files(), ["order1.json", "order2.json"])
 
     def test_gives_up_after_max_id_retries(self):
@@ -418,10 +391,6 @@ class PlaceOrderStorageFailureTests(ShopTestCase):
         order = place_order(self.storage, self.make_cart({PHONE: 1}), NAME, EMAIL)
         self.assertEqual(order.order_id, 1)
 
-
-# =====================================================================
-#  Гарантії шару збереження, на які спирається оформлення
-# =====================================================================
 class StorageGuaranteeTests(ShopTestCase):
     def test_failed_catalog_write_keeps_original_and_no_tmp_file(self):
         before = self.catalog_bytes()
@@ -453,10 +422,6 @@ class StorageGuaranteeTests(ShopTestCase):
         self.assertEqual([p.name for p in products], ["A"])
         self.assertEqual(len(logs.records), 6)  # кожен пропущений запис залогований
 
-
-# =====================================================================
-#  Оформлене замовлення в аналітиці
-# =====================================================================
 class CheckoutAnalyticsTests(ShopTestCase):
     def test_analytics_revenue_counts_goods_without_shipping(self):
         order = place_order(self.storage, self.make_cart({PHONE: 2}), NAME, EMAIL)

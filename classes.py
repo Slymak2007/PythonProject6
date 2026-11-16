@@ -1,16 +1,3 @@
-"""Предметна область інтернет-магазину.
-
-Структура (композиція):  Order  ─┬─ Customer
-                                 └─ [OrderItem, ...]   (знімок товару на момент покупки)
-Спадкування:  Product  ─┬─ PhysicalProduct  (є доставка: вага × тариф)
-                        └─ DigitalProduct   (доставки немає, є посилання на завантаження)
-
-Єдина схема даних (її читають і пишуть усі модулі):
-  catalog.json : product_id, name, base_price, type, stock, popularity,
-                 + weight_kg, shipping_rate (physical) або download_link (digital)
-  orderN.json  : order_id, customer_name, customer_email, date, status,
-                 items[ {id, title, price, quantity, shipping} ]
-"""
 import math
 import re
 from datetime import date
@@ -36,7 +23,6 @@ class InvalidStatusError(ShopError):
     """Недопустимий статус або перехід між статусами замовлення."""
 
 
-# ---------------------------------------------------------------- перевірки
 def _require_text(value, field):
     if not isinstance(value, str) or not value.strip():
         raise ValidationError(f"Поле «{field}» має бути непорожнім рядком")
@@ -67,9 +53,7 @@ def _require_field(data, key):
     return data[key]
 
 
-# ---------------------------------------------------------------- товари
 class Product:
-    """Базовий товар. Спільні поля та перевірки; доставку визначають нащадки."""
 
     product_type = None  # у нащадків: "physical" / "digital"
 
@@ -81,11 +65,9 @@ class Product:
         self.popularity = _require_int(popularity, "popularity")
 
     def shipping_cost(self):
-        """Вартість доставки одиниці товару. Перевизначається в нащадках."""
         return 0.0
 
     def calculate_total_price(self):
-        """Ціна одиниці товару разом з доставкою."""
         return self.base_price + self.shipping_cost()
 
     def to_dict(self):
@@ -100,7 +82,6 @@ class Product:
 
     @staticmethod
     def from_dict(data):
-        """Фабрика: за полем type створює потрібний клас товару."""
         if not isinstance(data, dict):
             raise ValidationError("Запис товару має бути об'єктом")
         ptype = _require_field(data, "type")
@@ -133,7 +114,6 @@ class PhysicalProduct(Product):
         self.shipping_rate = _require_number(shipping_rate, "shipping_rate")
 
     def shipping_cost(self):
-        # вага (кг) × тариф за кг
         return self.weight_kg * self.shipping_rate
 
     def to_dict(self):
@@ -157,8 +137,6 @@ class DigitalProduct(Product):
             raise ValidationError("Поле «download_link» має бути рядком")
         self.download_link = download_link.strip()
 
-    # shipping_cost() не перевизначаємо: цифровий товар не доставляється (0 грн)
-
     def to_dict(self):
         data = super().to_dict()
         data["download_link"] = self.download_link
@@ -172,7 +150,6 @@ class DigitalProduct(Product):
 PRODUCT_TYPES = {cls.product_type: cls for cls in (PhysicalProduct, DigitalProduct)}
 
 
-# ---------------------------------------------------------------- клієнт
 class Customer:
     def __init__(self, name, email):
         self.name = _require_text(name, "ім'я")
@@ -186,7 +163,6 @@ class Customer:
         return f"Клієнт {self.name} ({self.email})"
 
 
-# ---------------------------------------------------------------- замовлення
 class OrderStatus(str, Enum):
     NEW = "New"
     PAID = "Paid"
@@ -227,7 +203,6 @@ ALLOWED_TRANSITIONS = {
 
 
 class OrderItem:
-    """Позиція замовлення — знімок товару: ціна не зміниться, якщо каталог оновлять."""
 
     def __init__(self, product_id, title, unit_price, quantity, shipping=0.0):
         self.product_id = _require_int(product_id, "id", 1)
@@ -298,7 +273,6 @@ class Order:
         return self.goods_total + self.shipping_total
 
     def set_status(self, new_status):
-        """Змінює статус, якщо перехід дозволений (New→Paid→Shipped→Delivered; скасування з New/Paid)."""
         new_status = OrderStatus.parse(new_status)
         if new_status not in ALLOWED_TRANSITIONS[self.status]:
             raise InvalidStatusError(
@@ -342,10 +316,7 @@ class Order:
                 f"{units} шт. | {self.total:.2f} грн | {self.status.label}")
 
 
-# ---------------------------------------------------------------- кошик
 class Cart:
-    """Кошик. Склад НЕ змінює — залишки списуються лише при оформленні замовлення."""
-
     def __init__(self):
         self._lines = {}  # product_id -> [Product, quantity]
 

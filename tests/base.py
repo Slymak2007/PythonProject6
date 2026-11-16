@@ -1,7 +1,3 @@
-"""Спільна основа тестів: кожен тест отримує власне тимчасове сховище.
-
-Реальні файли проєкту (catalog/catalog.json, saved_orders/) тести НЕ чіпають.
-"""
 import json
 import os
 import shutil
@@ -11,17 +7,10 @@ import unittest
 from classes import Cart, DigitalProduct, PhysicalProduct
 from storage import Storage
 
-# ID товарів тестового каталогу
 PHONE, LAPTOP, EBOOK = 1, 2, 3
 
 NAME = "Іван Петренко"
 EMAIL = "ivan@example.com"
-
-# Тестовий каталог (числа підібрані так, щоб арифметика була точною):
-#   Phone  - 20000 грн, 0.5 кг × 50 грн/кг = 25 грн доставки, на складі 5
-#   Laptop - 25000 грн, на складі 0  (немає в наявності)
-#   Ebook  - 300 грн, цифровий (доставки немає), на складі 8
-
 
 class ShopTestCase(unittest.TestCase):
     def setUp(self):
@@ -39,9 +28,7 @@ class ShopTestCase(unittest.TestCase):
                            stock=8, popularity=2),
         ])
 
-    # ------------------------------------------------------------ допоміжні методи
     def product(self, product_id):
-        """Свіжа копія товару з диска."""
         return {p.product_id: p for p in self.storage.load_catalog()}[product_id]
 
     def stock(self, product_id):
@@ -58,7 +45,6 @@ class ShopTestCase(unittest.TestCase):
         self.storage.save_catalog(catalog)
 
     def make_cart(self, quantities):
-        """Кошик із {product_id: кількість}; товари беруться з диска на цей момент."""
         cart = Cart()
         for product_id, qty in quantities.items():
             cart.add(self.product(product_id), qty)

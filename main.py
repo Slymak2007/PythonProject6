@@ -1,4 +1,3 @@
-"""Консольний інтернет-магазин.  Запуск: python main.py"""
 import logging
 import sys
 
@@ -19,7 +18,6 @@ MENU = """
 0. Вихід"""
 
 
-# ---------------------------------------------------------------- введення
 def ask_int(prompt, minimum=None, maximum=None):
     """Питає ціле число, доки користувач не введе коректне."""
     while True:
@@ -41,7 +39,6 @@ def ask_text(prompt):
     return input(prompt).strip()
 
 
-# ---------------------------------------------------------------- команди
 def show_catalog(storage):
     products = storage.load_catalog()
     if not products:
@@ -140,7 +137,6 @@ def show_analytics(storage):
     print("=" * 50)
 
 
-# ---------------------------------------------------------------- головний цикл
 def main():
     logging.basicConfig(level=logging.WARNING, format="[%(levelname)s] %(message)s")
     storage = Storage()

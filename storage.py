@@ -43,7 +43,6 @@ def safe_io(operation):
 
 
 def _atomic_write_json(path, data):
-    """Пише у тимчасовий файл і підміняє оригінал: збій посеред запису не зіпсує дані."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp_path = path + ".tmp"
     try:
@@ -63,7 +62,6 @@ class Storage:
         self.catalog_path = catalog_path
         self.orders_dir = orders_dir
 
-    # ------------------------------------------------------------ каталог
     @safe_io("Не вдалося прочитати каталог")
     def load_catalog(self):
         if not os.path.exists(self.catalog_path):
@@ -91,7 +89,6 @@ class Storage:
     def save_catalog(self, products):
         _atomic_write_json(self.catalog_path, [p.to_dict() for p in products])
 
-    # ------------------------------------------------------------ замовлення
     def _order_path(self, order_id):
         return os.path.join(self.orders_dir, f"order{order_id}.json")
 
@@ -126,10 +123,6 @@ class Storage:
         return self._read_order(order_id)
 
     def iter_orders(self):
-        """Генератор: лінивий перебір замовлень за зростанням номера.
-
-        Пошкоджені або застарілі файли не зупиняють перебір — вони пропускаються з попередженням.
-        """
         for order_id in self._order_ids():
             try:
                 order = self._read_order(order_id)
@@ -140,7 +133,6 @@ class Storage:
 
     @safe_io("Не вдалося зберегти замовлення")
     def create_order(self, order):
-        """Створює новий файл замовлення; існуючий ніколи не перезаписує."""
         os.makedirs(self.orders_dir, exist_ok=True)
         path = self._order_path(order.order_id)
         try:
@@ -160,7 +152,6 @@ class Storage:
         _atomic_write_json(self._order_path(order.order_id), order.to_dict())
 
     def delete_order(self, order_id):
-        """Видаляє файл замовлення (використовується для відкату). Відсутній файл — не помилка."""
         try:
             os.remove(self._order_path(order_id))
         except FileNotFoundError:

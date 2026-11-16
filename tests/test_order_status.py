@@ -1,7 +1,3 @@
-"""Тести статусів замовлення та скасування (повернення товарів на склад).
-
-Запуск із кореня проєкту:   python -m unittest -v
-"""
 import json
 import os
 from unittest import mock
@@ -15,13 +11,11 @@ from tests.base import EBOOK, EMAIL, NAME, PHONE, ShopTestCase
 class OrderStatusTests(ShopTestCase):
     def setUp(self):
         super().setUp()
-        # замовлення №1: 2 телефони (на складі лишається 3, популярність 2)
         self.order = place_order(self.storage, self.make_cart({PHONE: 2}), NAME, EMAIL)
 
     def file_status(self, order_id=1):
         return self.read_order_json(order_id)["status"]
 
-    # ------------------------------------------------------------ переходи
     def test_new_order_starts_with_status_new(self):
         self.assertEqual(self.order.status, OrderStatus.NEW)
         self.assertEqual(self.file_status(), "New")
@@ -44,7 +38,6 @@ class OrderStatusTests(ShopTestCase):
         self.assertEqual(self.order_bytes(1), before)
 
     def test_unknown_status_is_rejected(self):
-        # «Оплачене» — це лише підпис для показу, у програмі приймається значення «Paid»
         for bad in ("Foo", "", None, "paid", "Оплачене"):
             with self.subTest(status=bad):
                 with self.assertRaises(InvalidStatusError):
@@ -69,7 +62,6 @@ class OrderStatusTests(ShopTestCase):
             change_order_status(self.storage, 99, "Paid")
         self.assertIsInstance(OrderNotFoundError("x"), StorageError)
 
-    # ------------------------------------------------------------ скасування
     def test_cancel_returns_stock_and_popularity(self):
         self.assertEqual((self.stock(PHONE), self.popularity(PHONE)), (3, 2))
         change_order_status(self.storage, 1, "Cancelled")
@@ -120,12 +112,11 @@ class OrderStatusTests(ShopTestCase):
                                    if p.product_id != PHONE])
 
         with self.assertLogs("shop_service", level="WARNING"):
-            change_order_status(self.storage, order2.order_id, "Cancelled")  # без винятку
+            change_order_status(self.storage, order2.order_id, "Cancelled")
 
-        self.assertEqual(self.stock(EBOOK), ebook_stock + 2)   # решту товарів повернуто
+        self.assertEqual(self.stock(EBOOK), ebook_stock + 2)
         self.assertEqual(self.file_status(order2.order_id), "Cancelled")
 
-    # ------------------------------------------------------------ пошкоджені файли
     def test_unknown_status_in_file_is_reported(self):
         data = self.read_order_json(1)
         data["status"] = "Weird"

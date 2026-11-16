@@ -1,11 +1,3 @@
-"""Графічний інтерфейс інтернет-магазину (Tkinter).
-
-Запуск:  python gui.py
-
-Інтерфейс не містить бізнес-логіки: каталог і замовлення читає/пише Storage (storage.py),
-оформлення і зміну статусів виконує shop_service.py, аналітику дає SalesAnalytics (analytics.py).
-Ті самі функції використовує і консольна версія (main.py).
-"""
 import logging
 import tkinter as tk
 import tkinter.font as tkfont
@@ -17,7 +9,6 @@ from storage import Storage
 
 log = logging.getLogger(__name__)
 
-# ---------- Кольори ----------
 BG = "#f4f5f9"
 CARD = "#ffffff"
 PRIMARY = "#4f46e5"
@@ -32,18 +23,12 @@ TYPE_LABELS = {"physical": "Фізичний", "digital": "Цифровий"}
 SEGMENT_LABELS = {"VIP": "VIP", "Regular": "Постійний", "Low-value": "Низька цінність"}
 
 
-# =====================================================================
-#  Робота з даними
-# =====================================================================
 def money(value):
     value = float(value)
     text = f"{value:,.0f}" if value == int(value) else f"{value:,.2f}"
     return text.replace(",", " ") + " грн"
 
 
-# =====================================================================
-#  Застосунок
-# =====================================================================
 class ShopApp(tk.Tk):
     SORTS = {
         "За популярністю": lambda p: -p.popularity,
@@ -86,7 +71,6 @@ class ShopApp(tk.Tk):
         self.refresh_catalog()
         self.refresh_cart()
 
-    # ------------------------------------------------------------ стиль
     def _setup_style(self):
         base = tkfont.nametofont("TkDefaultFont")
         base.configure(size=10)
@@ -127,7 +111,6 @@ class ShopApp(tk.Tk):
         s.map("Accent.TButton", background=[("active", PRIMARY_DARK), ("disabled", MUTED)])
         s.configure("Danger.TButton", foreground=DANGER)
 
-    # ------------------------------------------------------------ шапка
     def _build_header(self):
         bar = tk.Frame(self, bg=PRIMARY)
         bar.pack(fill="x")
@@ -141,7 +124,6 @@ class ShopApp(tk.Tk):
         self.status.set(text)
         self.status_label.configure(fg=color)
 
-    # ------------------------------------------------------------ вкладка «Каталог»
     def _build_catalog_tab(self):
         tab = ttk.Frame(self.nb, padding=16)
         self.nb.add(tab, text="  Каталог  ")
@@ -191,7 +173,6 @@ class ShopApp(tk.Tk):
                   style="Muted.TLabel").pack(side="right")
 
     def _reload_catalog(self):
-        """Перечитує каталог з диска. Якщо не вдалося — лишає попередній стан і показує причину."""
         try:
             self.catalog = self.storage.load_catalog()
         except ShopError as exc:
@@ -240,7 +221,6 @@ class ShopApp(tk.Tk):
         self.refresh_cart()
         self._set_status(f"✓ «{product.name}» × {qty} додано в кошик", SUCCESS)
 
-    # ------------------------------------------------------------ вкладка «Кошик»
     def _build_cart_tab(self):
         self.cart_tab = ttk.Frame(self.nb, padding=16)
         self.nb.add(self.cart_tab, text="  Кошик  ")
@@ -352,7 +332,6 @@ class ShopApp(tk.Tk):
         messagebox.showinfo("Дякуємо за замовлення!",
                             f"Замовлення #{order.order_id} оформлено.\nДо сплати: {money(order.total)}")
 
-    # ------------------------------------------------------------ вкладка «Замовлення»
     def _build_orders_tab(self):
         tab = ttk.Frame(self.nb, padding=16)
         self.nb.add(tab, text="  Замовлення  ")
@@ -476,7 +455,6 @@ class ShopApp(tk.Tk):
         self.refresh_orders(select=order.order_id)
         self._set_status(f"✓ Замовлення #{order.order_id}: статус «{chosen.label}»", SUCCESS)
 
-    # ------------------------------------------------------------ вкладка «Аналітика»
     def _build_analytics_tab(self):
         tab = ttk.Frame(self.nb, padding=16)
         self.nb.add(tab, text="  Аналітика  ")
@@ -601,7 +579,6 @@ class ShopApp(tk.Tk):
             c.create_text(x0 + bar_w / 2, h - pad_b + 12, text=lab, fill=MUTED,
                           font=("TkDefaultFont", 8))
 
-    # ------------------------------------------------------------ службове
     def _on_tab_changed(self, _event=None):
         title = self.nb.tab(self.nb.select(), "text").strip()
         if title == "Замовлення":

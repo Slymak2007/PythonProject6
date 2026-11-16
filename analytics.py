@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 from typing import Generator, Dict, Any, Union
 import datetime
-#dslkf
 
 def get_field(item: Any, *keys, default=None):
     if isinstance(item, dict):
@@ -28,7 +27,6 @@ def get_field(item: Any, *keys, default=None):
 
 
 def stream_order_logs(source: Union[str, list]) -> Generator[Dict[str, Any], None, None]:
-    """Генератор для потокового читання замовлень."""
     if isinstance(source, list):
         yield from source
         return
@@ -53,8 +51,6 @@ def stream_order_logs(source: Union[str, list]) -> Generator[Dict[str, Any], Non
 
 
 class SalesAnalytics:
-    """Аналіз продажів на Pandas та NumPy."""
-
     def __init__(self, orders_generator):
         raw_records = []
         for order in orders_generator:
